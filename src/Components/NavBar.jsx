@@ -18,7 +18,7 @@ function NavBar({setFavoriteWords, userLogin, setLoggedInUser, loggedInUser, set
     }
 
     function handleLogOut() {
-        fetch('logout', {method: "DELETE"})
+        fetch('https://dictionary-thesaurus-api.herokuapp.com/logout', {method: "DELETE"})
         .then(resp => {
             if (resp.ok) {
                 setLoggedInUser(null)

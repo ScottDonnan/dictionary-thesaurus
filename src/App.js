@@ -38,7 +38,7 @@ function App() {
   },[]) 
 
   function getFavorites(user) {
-    fetch(`users/favorite_words/${user.id}`)
+    fetch(`https://dictionary-thesaurus-api.herokuapp.com/users/favorite_words/${user.id}`)
         .then(resp => resp.json())
         .then(words => setFavoriteWords(words))
   }
@@ -70,7 +70,7 @@ function App() {
       password: password
     }
 
-    fetch(`login`, {
+    fetch(`https://dictionary-thesaurus-api.herokuapp.com/login`, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(loginObj)
@@ -91,7 +91,7 @@ function App() {
       user_id: userObj.id,
       name: wordObj.name
         }
-      fetch('favorites', {
+      fetch('https://dictionary-thesaurus-api.herokuapp.com/favorites', {
         method: 'POST',
         headers: {
           'Content-Type':'application/json'
@@ -130,7 +130,7 @@ function App() {
 
   function handleDeleteFavorite(favorite) {
     console.log(favorite)
-    fetch(`favorites/${favorite.id}`, {
+    fetch(`https://dictionary-thesaurus-api.herokuapp.com/favorites/${favorite.id}`, {
       method: 'DELETE'
     })
     .then(resp => {

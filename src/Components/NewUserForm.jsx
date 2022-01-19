@@ -40,7 +40,7 @@ function NewUserForm({setLoggedInUser, setFavoriteWords, getFavorites}) {
 
         console.log(username, password, passConfirmation);
 
-        fetch('signup', {
+        fetch('https://dictionary-thesaurus-api.herokuapp.com/signup', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
