@@ -20,7 +20,7 @@ function App() {
   const [favoriteWords, setFavoriteWords] = useState([])
   
   useEffect(()=>{
-    fetch('me').then(resp => {
+    fetch('https://dictionary-thesaurus-api.herokuapp.com/me').then(resp => {
       if (resp.ok) {
         resp.json()
         .then(user => {
