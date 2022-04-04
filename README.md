@@ -2,6 +2,10 @@
 
 This project is a dictionary and thesaurus application that allows a user to search for the definition of a word or synonyms of a word through Merriam-Webster’s Encyclopedia API, view a randomly generated word and its definition, and save a list of favorite words for future reference.
 
+The user and favorite word API can be found at this repository:
+    dictionary-thesaurus-db (https://github.com/ScottDonnan/dictionary-thesaurus-db)
+    
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
