@@ -1,9 +1,11 @@
 import { useState } from "react";
 import styled from "styled-components";
+import History from "./History";
 
-function Search ({getWordDefinition, getWordSynonym, setSearchWord, setThesaurusSearchWord}) {
+function Search ({loggedInUser, getWordDefinition, getWordSynonym}) {
     const [searchValue, setSearchValue] = useState("") 
     const [searchSwitcher, setSearchSwitcher] = useState(true)
+    const [historyList, setHistoryList] = useState([])
     
     function handleChange(e) {
         e.preventDefault()
@@ -13,20 +15,28 @@ function Search ({getWordDefinition, getWordSynonym, setSearchWord, setThesaurus
     function handleSubmit(e) {
         e.preventDefault()
         searchSwitcher ? getWordDefinition(searchValue) : getWordSynonym(searchValue)
+        
+        const temp = historyList
+        if (!temp.includes(searchValue)) {
+            setHistoryList([...temp, searchValue])
+        }
     }
 
-    const setSwitchTrue = () => setSearchSwitcher(switcher => switcher = true)
-    const setSwitchFalse = () => setSearchSwitcher(switcher => switcher = false)
+    const dictionaryOn = () => setSearchSwitcher(switcher => switcher = true)
+    const thesaurusOn = () => setSearchSwitcher(switcher => switcher = false)
     
     
     return(
         <SearchPage>
-            <Form onSubmit={handleSubmit}>
-                <SearchBar type="text" name="search" value={searchValue} onChange={handleChange} />
-                <SearchButton type="submit" value="Submit">Search</SearchButton>
-            </Form>
-            {searchSwitcher ? <ButtonStyled onClick={setSwitchTrue}>Dictionary</ButtonStyled> : <Button onClick={setSwitchTrue}>Dictionary</Button>}
-            {searchSwitcher ? <Button onClick={setSwitchFalse}>Thesaurus</Button> : <ButtonStyled onClick={setSwitchTrue}>Thesaurus</ButtonStyled>}
+            <SearchBox>
+                <Form onSubmit={handleSubmit}>
+                    <SearchBar type="text" name="search" value={searchValue} onChange={handleChange} />
+                    <SearchButton type="submit" value="Submit">Search</SearchButton>
+                </Form>
+                {searchSwitcher ? <ButtonStyled>Dictionary</ButtonStyled> : <Button onClick={dictionaryOn}>Dictionary</Button>}
+                {searchSwitcher ? <Button onClick={thesaurusOn}>Thesaurus</Button> : <ButtonStyled>Thesaurus</ButtonStyled>}
+            </SearchBox>
+            {loggedInUser ? <History historyList={historyList}/> : null}
         </SearchPage>
     )
 }
@@ -34,14 +44,17 @@ function Search ({getWordDefinition, getWordSynonym, setSearchWord, setThesaurus
 export default Search
 
 const SearchPage = styled.div `
-  display: flex;
-  justify-content: center;
   background-color: #ffffff;
   padding: 20px;
   font-family: Helvetica, sans-serif
   margin: 80px 100px;
   box-shadow: 0 0 20px rgba(0, 0, 0, .5), 0 0 40px rgba(0, 0, 0, 0.3);
   border-radius: 15px;
+`
+
+const SearchBox = styled.div `
+    display: flex;
+    justify-content: center;
 `
 
 const Form = styled.form `

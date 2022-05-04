@@ -18,6 +18,7 @@ function App() {
   const [thesaurusSearchWord, setThesaurusSearchWord] = useState("")
   const [isLiked, setIsLiked] = useState(true)
   const [favoriteWords, setFavoriteWords] = useState([])
+  const [mostSearched, setMostSearched] = useState([])
   
   useEffect(()=>{
     fetch('https://dictionary-thesaurus-api.herokuapp.com/me').then(resp => {
@@ -37,10 +38,30 @@ function App() {
     })
   },[]) 
 
+  useEffect(() => {
+    getSearchedList()
+  }, [])
+
+  function getSearchedList() {
+    fetch('/word_search_list').then(resp => resp.json().then(data => setMostSearched(data)))
+  }
+  
   function getFavorites(user) {
     fetch(`https://dictionary-thesaurus-api.herokuapp.com/users/favorite_words/${user.id}`)
         .then(resp => resp.json())
         .then(words => setFavoriteWords(words))
+  }
+
+  function updateWord(value) {
+    const wordUpdate = {
+      name: value
+    }
+    fetch('/words', {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(wordUpdate)
+    })
+    .then(resp => {if(resp.ok) getSearchedList()})
   }
   
   function getWordDefinition(searchValue) {
@@ -49,18 +70,23 @@ function App() {
             if (r.ok) {
               r.json().then(data => {
                   if (data[0].meta) {
+                    updateWord(searchValue)
                     setSearchWord(data)
                   } else {
                     alert("word not found")
                   }
               })
             }
-    })}
+    })
+  }
 
   function getWordSynonym(searchValue) {
     fetch(`https://dictionaryapi.com/api/v3/references/thesaurus/json/${searchValue}?key=bf67571a-955e-4874-aa11-d4d40d976166`)
     .then(r => r.json())
-    .then(data => setThesaurusSearchWord(data))
+    .then(data => {
+      setThesaurusSearchWord(data)
+      updateWord(searchValue)
+    })
   }
 
   function userLogin(username, password, e) {
@@ -82,14 +108,15 @@ function App() {
           getFavorites(user)
         })
       } else {
-        resp.json().then(data => console.log(data))
+        alert('status :'+ resp.status + " " + resp.statusText)
+        // resp.json().then(data => console.log(data))
       }
     })}
   
   const addWordToFavorites = (wordObj, userObj) => {
     const userFavObj ={
       user_id: userObj.id,
-      name: wordObj.name
+      name: wordObj.name,
         }
       fetch('https://dictionary-thesaurus-api.herokuapp.com/favorites', {
         method: 'POST',
@@ -153,9 +180,15 @@ function App() {
           </Route>
           <Route path="/">
             <NavBar userLogin={userLogin} setLoggedInUser={setLoggedInUser} loggedInUser={loggedInUser} setIsLoggedIn={setIsLoggedIn} isLoggedIn={isLoggedIn} />
-            <Search getWordDefinition={getWordDefinition} getWordSynonym={getWordSynonym} setSearchWord={setSearchWord} setThesaurusSearchWord={setThesaurusSearchWord}/> 
+            <Search loggedInUser={loggedInUser} getWordDefinition={getWordDefinition} getWordSynonym={getWordSynonym} setSearchWord={setSearchWord} setThesaurusSearchWord={setThesaurusSearchWord}/> 
             {searchWord? <WordCard handleDeleteFavorite={handleDeleteFavorite} favoriteWords={favoriteWords} isLiked={isLiked} addWordToFavorites={addWordToFavorites} isLiked={isLiked} setSearchWord={setSearchWord} searchWord={searchWord[0]} isLoggedIn={isLoggedIn} loggedInUser={loggedInUser}/> : null}
             {thesaurusSearchWord? <ThesaurusCard setThesaurusSearchWord={setThesaurusSearchWord} thesaurusSearchWord={thesaurusSearchWord[0]} /> : null}
+            <div>
+              <h3>Most Searched Words</h3>
+              <ul>
+                {mostSearched.map((fav, indx) => <li key={indx}>{fav.name} : {fav.times_searched}</li>)}
+              </ul>
+            </div>
             {loggedInUser ? <FavoriteList favoriteWords={favoriteWords} handleDeleteFavorite={handleDeleteFavorite} favList={favList} isLoggedIn={isLoggedIn} loggedInUser={loggedInUser}/> : null }
           </Route>
         </Switch>
